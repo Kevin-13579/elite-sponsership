@@ -1,0 +1,155 @@
+/* =========================
+   PAGE LAYOUT
+========================= */
+
+.register-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f4f6f8;
+    font-family: "Inter", "Segoe UI", sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle floating glow animation */
+
+.register-page::before {
+    content: "";
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0,0,0,0.05), transparent 70%);
+    top: -200px;
+    left: -200px;
+    animation: floatGlow 10s ease-in-out infinite alternate;
+}
+
+.register-page::after {
+    content: "";
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(0,0,0,0.04), transparent 70%);
+    bottom: -200px;
+    right: -200px;
+    animation: floatGlow 12s ease-in-out infinite alternate-reverse;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.register-car {
+    position: relative;
+    z-index: 2;
+    background: #ffffff;
+    padding: 45px 40px;
+    border-radius: 18px;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    transition: all 0.4s ease;
+}
+
+.register-car:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.12);
+}
+
+/* =========================
+   HEADINGS
+========================= */
+
+.register-car h2 {
+    font-weight: 600;
+    color: #111111;
+    margin-bottom: 6px;
+}
+
+.register-car p {
+    color: #666666;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.register-car form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Inputs & Select */
+
+.register-car input,
+.register-car select {
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #dcdcdc;
+    background: #f9f9f9;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.register-car input:focus,
+.register-car select:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: #111111;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+/* Label Styling */
+
+.register-car label {
+    text-align: left;
+    font-size: 0.85rem;
+    color: #444444;
+    margin-top: 4px;
+}
+
+/* =========================
+   BUTTON
+========================= */
+
+.register-car button {
+    margin-top: 10px;
+    padding: 13px;
+    border-radius: 10px;
+    border: none;
+    background: #111111;
+    color: #ffffff;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.register-car button:hover {
+    background: #333333;
+    transform: translateY(-2px);
+}
+
+.register-car button:active {
+    transform: scale(0.98);
+}
+
+/* =========================
+   ANIMATION
+========================= */
+
+@keyframes floatGlow {
+    from {
+        transform: translate(0px, 0px);
+    }
+    to {
+        transform: translate(40px, 40px);
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-EliteSponsershipApplication<elite-sponsership>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.devopstitans.elite_sponsership.EliteSponsershipApplication",
+            "projectName": "elite-sponsership",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
