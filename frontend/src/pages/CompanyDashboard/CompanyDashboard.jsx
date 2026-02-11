@@ -4,22 +4,24 @@ import { FaHome, FaHeart, FaPlayCircle, FaCommentDots, FaUserTie, FaSearch, FaPa
 import './CompanyDashboard.css';
 
 const CompanyDashboard = () => {
-    // 1. State Management
+    // 1. Configuration - REPLACE THIS with your actual Render URL
+    const API_BASE_URL = "https://elite-sponsership.onrender.com"; 
+
+    // 2. State Management
     const [view, setView] = useState('home'); 
-    const [projects, setProjects] = useState([]); // Master list
-    const [filteredProjects, setFilteredProjects] = useState([]); // Display list
+    const [projects, setProjects] = useState([]); 
+    const [filteredProjects, setFilteredProjects] = useState([]); 
     const [searchFilters, setSearchFilters] = useState({ budget: '', location: 'Tamil Nadu' });
     
-    // Chat States
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
     const companyId = localStorage.getItem('userId');
 
-    // 2. Fetch Data on Load
+    // 3. Fetch Projects on Load
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const res = await axios.get("http://localhost:8080/api/projects/all");
+                const res = await axios.get(`${API_BASE_URL}/api/projects/all`);
                 setProjects(res.data);
                 setFilteredProjects(res.data);
             } catch (err) {
@@ -27,19 +29,28 @@ const CompanyDashboard = () => {
             }
         };
         fetchProjects();
-    }, []);
+    }, [API_BASE_URL]);
 
-    // 3. Search Functionality
+    // 4. Fetch Chat History
+    const fetchChatHistory = async (studentId) => {
+        try {
+            const res = await axios.get(`${API_BASE_URL}/api/messages/history/${companyId}/${studentId}`);
+            setMessages(res.data);
+        } catch (err) {
+            console.error("Could not load chat", err);
+        }
+    };
+
+    // 5. Search Functionality
     const handleSearch = () => {
         const results = projects.filter(p => {
-            const matchesLocation = searchFilters.location === 'Others' ? true : p.location === searchFilters.location; // Assuming location added to model
             const matchesBudget = searchFilters.budget === '' ? true : p.expectedFunds <= parseFloat(searchFilters.budget);
             return matchesBudget;
         });
         setFilteredProjects(results);
     };
 
-    // 4. Investment & Chat Logic
+    // 6. Investment Logic
     const handleInvest = async (project) => {
         const proposal = {
             senderId: companyId,
@@ -47,21 +58,34 @@ const CompanyDashboard = () => {
             content: `INTERESTED: We have viewed your pitch for "${project.title}" and are ready to invest. Let's discuss the terms.`
         };
 
-
-        const fetchChatHistory = async (studentId) => {
-    try {
-        const res = await axios.get(`http://localhost:8080/api/messages/history/${companyId}/${studentId}`);
-        setMessages(res.data);
-    } catch (err) {
-        console.error("Could not load chat");
-    }
-};
         try {
-            await axios.post("http://localhost:8080/api/messages/send", proposal);
+            await axios.post(`${API_BASE_URL}/api/messages/send`, proposal);
             alert("Investment proposal sent successfully!");
-            setView('messages'); // Take company to the chat tab
+            await fetchChatHistory(project.studentId);
+            setView('messages'); 
         } catch (err) {
             alert("Failed to send proposal. Check backend.");
+        }
+    };
+
+    // 7. Send New Message Logic
+    const sendMessage = async () => {
+        if (!newMessage.trim()) return;
+        
+        // Use the studentId from the last message received to reply
+        const lastMsg = messages[messages.length - 1];
+        const receiverId = lastMsg?.senderId === companyId ? lastMsg.receiverId : lastMsg?.senderId;
+
+        try {
+            const res = await axios.post(`${API_BASE_URL}/api/messages/send`, {
+                senderId: companyId,
+                receiverId: receiverId,
+                content: newMessage
+            });
+            setMessages([...messages, res.data]);
+            setNewMessage("");
+        } catch (err) {
+            console.error("Failed to send message");
         }
     };
 
@@ -80,7 +104,6 @@ const CompanyDashboard = () => {
                             <option value="Tamil Nadu">Tamil Nadu</option>
                             <option value="Others">Others</option>
                         </select>
-                        {/* SEARCH ICON CALL */}
                         <button className="search-icon-btn" onClick={handleSearch}>
                             <FaSearch />
                         </button>
@@ -91,7 +114,6 @@ const CompanyDashboard = () => {
             {/* --- MAIN CONTENT AREA --- */}
             <main className="content-area">
                 
-                {/* HOME VIEW: Brief Cards */}
                 {view === 'home' && (
                     <div className="brief-feed">
                         {filteredProjects.map(p => (
@@ -100,7 +122,7 @@ const CompanyDashboard = () => {
                                     <h3>{p.title}</h3>
                                     <span className="budget-tag">₹{p.expectedFunds}</span>
                                 </div>
-                                <p>{p.description.substring(0, 120)}...</p>
+                                <p>{p.description?.substring(0, 120)}...</p>
                                 <div className="card-footer">
                                     <span className="tech">{p.techStack}</span>
                                     <button onClick={() => setView('reels')}>Watch Pitch</button>
@@ -110,12 +132,12 @@ const CompanyDashboard = () => {
                     </div>
                 )}
 
-                {/* REELS VIEW: Video Feed */}
                 {view === 'reels' && (
                     <div className="reels-vertical">
                         {filteredProjects.map(p => (
                             <div key={p.id} className="reel-segment">
-                                <video src={`http://localhost:8080/uploads/${p.videoPath}`} controls />
+                                {/* CLOUDINARY CHANGE: Just use p.videoPath directly */}
+                                <video src={p.videoPath} controls />
                                 <div className="reel-info-overlay">
                                     <h2>{p.title}</h2>
                                     <p>Tech: {p.techStack}</p>
@@ -129,41 +151,40 @@ const CompanyDashboard = () => {
                 )}
 
                 {view === 'messages' && (
-    <div className="messages-container">
-        <div className="chat-window">
-            <div className="chat-header">Direct Pitch Conversation</div>
-            <div className="chat-messages">
-                {messages.length === 0 ? (
-                    <div className="msg system">No conversation selected. Send an "Invest" prompt to a student to start!</div>
-                ) : (
-                    messages.map((m) => (
-                        <div key={m.id} className={`msg ${m.senderId == companyId ? 'sent' : 'received'}`}>
-                            {m.content}
+                    <div className="messages-container">
+                        <div className="chat-window">
+                            <div className="chat-header">Direct Pitch Conversation</div>
+                            <div className="chat-messages">
+                                {messages.length === 0 ? (
+                                    <div className="msg system">No conversation selected.</div>
+                                ) : (
+                                    messages.map((m) => (
+                                        <div key={m.id} className={`msg ${m.senderId == companyId ? 'sent' : 'received'}`}>
+                                            {m.content}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <div className="chat-input-area">
+                                <input 
+                                    type="text" 
+                                    placeholder="Type a message..." 
+                                    value={newMessage}
+                                    onChange={(e) => setNewMessage(e.target.value)}
+                                />
+                                <button onClick={sendMessage}>
+                                    <FaPaperPlane />
+                                </button>
+                            </div>
                         </div>
-                    ))
+                    </div>
                 )}
-            </div>
-            <div className="chat-input-area">
-                <input 
-                    type="text" 
-                    placeholder="Type a message..." 
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                />
-                <button onClick={() => {/* Function to send current message */}}>
-                    <FaPaperPlane />
-                </button>
-            </div>
-        </div>
-    </div>
-)}
 
-                {/* PROFILE VIEW: Stats */}
                 {view === 'profile' && (
                     <div className="company-profile">
                         <div className="profile-header">
                             <FaUserTie className="big-avatar" />
-                            <h2>Elite Corp Dashboard</h2>
+                            <h2>Company Dashboard</h2>
                         </div>
                         <div className="stats-grid">
                             <div className="stat-card"><h4>12</h4><p>Investments</p></div>
