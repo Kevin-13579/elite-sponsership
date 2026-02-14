@@ -41,7 +41,7 @@
    CARD
 ========================= */
 
-.register-car {
+.register-card {
     position: relative;
     z-index: 2;
     background: #ffffff;
@@ -55,7 +55,7 @@
     transition: all 0.4s ease;
 }
 
-.register-car:hover {
+.register-card:hover {
     transform: translateY(-6px);
     box-shadow: 0 25px 70px rgba(0, 0, 0, 0.12);
 }
@@ -80,7 +80,7 @@
    FORM
 ========================= */
 
-.register-car form {
+.register-card form {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -88,8 +88,8 @@
 
 /* Inputs & Select */
 
-.register-car input,
-.register-car select {
+.register-card input,
+.register-card select {
     padding: 12px 14px;
     border-radius: 10px;
     border: 1px solid #dcdcdc;
@@ -98,8 +98,8 @@
     transition: all 0.3s ease;
 }
 
-.register-car input:focus,
-.register-car select:focus {
+.register-card input:focus,
+.register-card select:focus {
     outline: none;
     background: #ffffff;
     border-color: #111111;
@@ -108,7 +108,7 @@
 
 /* Label Styling */
 
-.register-car label {
+.register-card label {
     text-align: left;
     font-size: 0.85rem;
     color: #444444;
@@ -119,7 +119,7 @@
    BUTTON
 ========================= */
 
-.register-car button {
+.register-card button {
     margin-top: 10px;
     padding: 13px;
     border-radius: 10px;
@@ -132,12 +132,12 @@
     transition: all 0.3s ease;
 }
 
-.register-car button:hover {
+.register-card button:hover {
     background: #333333;
     transform: translateY(-2px);
 }
 
-.register-car button:active {
+.register-card button:active {
     transform: scale(0.98);
 }
 
